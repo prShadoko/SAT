@@ -123,3 +123,4 @@ formule* equiv(formule* arg1, formule* arg2) {
     return mkbinop(o_equivaut,arg1,arg2);
 }
 
+
