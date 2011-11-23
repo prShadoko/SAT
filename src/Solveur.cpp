@@ -7,7 +7,7 @@ void numerote(const formule* form, map<string, int> &correspondance) {
 		if(correspondance.count(*(form->nom)) == 1) {
 			return;
 		}
-		int num = correspondance.size() + 1;
+		int num = correspondance.size();
 		correspondance[*(form->nom)] = num;
 		cout << "variable " << *(form->nom) << " est le n°" << correspondance[*(form->nom)] << endl;
 	} else {
@@ -127,7 +127,7 @@ forme_conjonctive trad_fc_non(const forme_conjonctive &fc) {
 char clause_est_satisfaite(const clause &cl, const char *valeurs) {
 	bool indetermine = false;
 	for(clause::const_iterator it=cl.begin(); it!=cl.end(); it++) {
-		int litteral = *it * valeurs[abs(*it) - 1];
+		int litteral = *it * valeurs[abs(*it)];
 		if(litteral > 0) {
 			return 1;
 		} else if(litteral == 0) {
