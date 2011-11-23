@@ -2,6 +2,7 @@
 #include <sstream>
 #include "Formule.hpp"
 #include "Parsers.hpp"
+#include "Solveur.hpp"
 
 using namespace std;
 
@@ -9,7 +10,7 @@ int main(int argc, char** argv) {
 //*
     formule *une_formule;
     string lue;
-    map<string,int> correspondance;
+    map<string, int> correspondance;
     
     if (argc >= 2) {
         lue = string(argv[1]);

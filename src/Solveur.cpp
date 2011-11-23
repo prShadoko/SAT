@@ -1,4 +1,6 @@
-#include "Formule.hpp"
+#include "Solveur.hpp"
+
+// ================================================= NUMÉROTATION DES VARIABLES
 
 void numerote(const formule* form, map<string, int> &correspondance) {
 	if (form->op == o_variable) {
@@ -17,6 +19,8 @@ void numerote(const formule* form, map<string, int> &correspondance) {
         }
 	}
 }
+
+// ============================================ TRADUCTION EN FORME CONJONCTIVE
 
 forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, int> &correspondance) {
 	forme_conjonctive fc, fc1, fc2;
@@ -117,3 +121,21 @@ forme_conjonctive trad_fc_non(const forme_conjonctive &fc) {
 	
 	return res;
 }
+
+// ======================================= EXPLORATION DE L'ESPACE DE RECHERCHE
+
+char clause_est_satisfaite(const clause &cl, const char *valeurs) {
+	bool indetermine = false;
+	for(clause::const_iterator it=cl.begin(); it!=cl.end(); it++) {
+		int litteral = *it * valeurs[abs(*it) - 1];
+		if(litteral > 0) {
+			return 1;
+		} else if(litteral == 0) {
+			indetermine = true;
+		}
+	}
+	return (indetermine ? 0 : -1);
+}
+
+
+
