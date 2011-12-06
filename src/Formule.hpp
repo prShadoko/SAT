@@ -42,7 +42,7 @@ extern string formule2string(const formule * f);
 extern bool is_binary(const operateur);
 extern int priority_level(const operateur);
 extern operateur operateur_for_level(const int lvl);
-//extern void detruire_formule(formule *form);
+extern void detruire_formule(formule *form);
 extern formule* conversion_implique(const formule *form);
 extern formule* conversion_equivaut(const formule *form);
 #define START_LVL 5

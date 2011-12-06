@@ -124,7 +124,27 @@ formule* equiv(formule* arg1, formule* arg2) {
 }
 
 void detruire_formule(formule *form) {
-	//TODO: Désallouer toutes les allocations d'une formule et de ses sous-formules
+	switch(form->op) {
+		case o_variable:
+		{
+			delete form->nom;
+			break;
+		}
+		
+		case o_non:
+		{
+			detruire_formule(form->arg);
+			break;
+		}
+		
+		default: // Opérateurs binaires
+		{
+			detruire_formule(form->arg1);
+			detruire_formule(form->arg2);
+			break;
+		}
+	}
+	delete form;
 }
 
 formule* conversion_implique(const formule *form) {
