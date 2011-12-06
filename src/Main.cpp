@@ -32,7 +32,18 @@ int main(int argc, char** argv) {
     numerote(une_formule, correspondance);
     // TRADUCTION EN FORME CONJONCTIVE
 	formule_simplifiee = simplifie_formule(une_formule);
-	cout << "Formule simplifiée :" << endl << formule2string(formule_clean) << endl;
+	cout << "Formule simplifiée :" << endl << formule2string(formule_simplifiee) << endl;
+	fc = trad_forme_conjonctive(formule_simplifiee, correspondance);
+	
+	forme_conjonctive::const_iterator fc_it;
+	clause::const_iterator cl_it;
+	for(fc_it=fc.begin(); fc_it!=fc.end(); fc_it++) {
+		for(cl_it=fc_it->begin(); cl_it!=fc_it->end(); cl_it++) {
+			cout << *cl_it << "\t";
+		}
+		cout << endl;
+	}
+	
 	// EXPLORATION DE L'ESPACE DE RECHERCHE
 //	valeurs = new char[correspondance.size()];
 //	cherche(fc, 0, valeurs);
