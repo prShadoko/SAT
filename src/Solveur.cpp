@@ -2,7 +2,7 @@
 
 // ================================================= NUMÉROTATION DES VARIABLES
 
-void numerote(const formule* form, map<string, int> &correspondance) {
+void numerote(const formule *form, map<string, int> &correspondance) {
 	if (form->op == o_variable) {
 		if(correspondance.count(*(form->nom)) == 1) {
 			return;
@@ -22,6 +22,86 @@ void numerote(const formule* form, map<string, int> &correspondance) {
 
 // ============================================ TRADUCTION EN FORME CONJONCTIVE
 
+formule* simplifie_formule(const formule *form, const bool negation) {
+	formule *form_out = NULL;
+	
+	switch(form->op) {
+		case o_variable:
+		{
+cerr << "o_variable" << endl;
+			if(negation) {
+				form_out = non(var(*(form->nom)));
+			} else {
+				form_out = var(*(form->nom));
+			}
+			break;
+		}
+		
+		case o_equivaut:
+		{
+cerr << "o_equivaut" << endl;
+			if(negation) {
+				form_out = ou(	
+									et(	simplifie_formule(form->arg1, true),
+										simplifie_formule(form->arg2)),
+									et(	simplifie_formule(form->arg2, true),
+										simplifie_formule(form->arg1))
+								);
+			} else {
+				form_out = et(
+									ou(	simplifie_formule(form->arg1, true),
+										simplifie_formule(form->arg2)),
+									ou(	simplifie_formule(form->arg2, true),
+										simplifie_formule(form->arg1))
+								);
+			}
+			break;
+		}
+		
+		case o_implique:
+		{
+cerr << "o_implique" << endl;
+			if(negation) {
+				form_out = et(simplifie_formule(form->arg1), simplifie_formule(form->arg2, true));
+			} else {
+				form_out = ou(simplifie_formule(form->arg1, true), simplifie_formule(form->arg2));
+			}
+			break;
+		}
+		
+		case o_non:
+		{
+cerr << "o_non" << endl;
+			form_out = simplifie_formule(form->arg, !negation);
+			break;
+		}
+		
+		case o_ou:
+		{
+cerr << "o_ou" << endl;
+			if(negation) {
+				form_out = et(simplifie_formule(form->arg1, true), simplifie_formule(form->arg2, true));
+			} else {
+				form_out = ou(simplifie_formule(form->arg1), simplifie_formule(form->arg2));
+			}
+			break;
+		}
+		
+		case o_et:
+		{
+cerr << "o_et" << endl;
+			if(negation) {
+				form_out = ou(simplifie_formule(form->arg1, true), simplifie_formule(form->arg2, true));
+			} else {
+				form_out = et(simplifie_formule(form->arg1), simplifie_formule(form->arg2));
+			}
+			break;
+		}
+	}
+	return form_out;
+}
+
+/*
 forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, int> &correspondance) {
 	forme_conjonctive fc, fc1, fc2;
 	formule *form_convertie = new formule();
@@ -63,17 +143,17 @@ forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, int> &
 			fc = trad_fc_ou(fc1, fc2);
 			break;
 	  	}
-/*
+
 		case o_implique:
 		{
 			fc = trad_fc_implique(fc1, fc2);
 	  		break;
 		}
+		
   		case o_equivaut:
 		{
 			fc = trad_fc_equivaut(fc1, fc2);
   			break;
-//*/
 	}
 	return fc;
 }
@@ -133,7 +213,7 @@ forme_conjonctive trad_fc_non(const forme_conjonctive &fc) {
 	
 	return res;
 }
-
+//*/
 // ======================================= EXPLORATION DE L'ESPACE DE RECHERCHE
 
 char clause_est_satisfaite(const clause &cl, const char *valeurs) {
@@ -163,14 +243,16 @@ char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs)
 }
 
 bool cherche(const forme_conjonctive &fc, const int id_var, char *valeurs) {
+return false;
+/*
 	if(id_var >= valeurs.size()) {
-		return (forme_conj_satisfaite(fc, valeurs) == 1);
+		return (forme_conj_est_satisfaite(fc, valeurs) == 1);
 	}
-	valeurs[id_vars] = 1;
-	if(cherche(fc, id_var+1, valeurs) {
+	valeurs[id_var] = 1;
+	if(cherche(fc, id_var+1, valeurs)) {
 		return true;
 	} else {
-		valeurs[id_valeurs] = -1;
+		valeurs[id_var] = -1;
 		if(cherche(fc, id_var+1, valeurs)) {
 			return true;
 		} else {
@@ -178,4 +260,5 @@ bool cherche(const forme_conjonctive &fc, const int id_var, char *valeurs) {
 			return false;
 		}
 	}
+//*/
 }

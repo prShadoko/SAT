@@ -75,3 +75,38 @@
 		}
 	}
 //*/
+/*----- TEST simplifie_formule()() -----
+	// DÉCLARATION DES VARIABLES
+    formule *une_formule;
+    string lue;
+    map<string, int> correspondance;
+    forme_conjonctive fc;
+    char *valeurs = NULL;
+    
+    // LECTURE DE LA FORMULE
+    if (argc >= 2) {
+        lue = string(argv[1]);
+        une_formule = litFormuleFichier(argv[1]);
+    } else {
+        stringbuf buffer;
+        cin.get(buffer);
+        lue = buffer.str();
+        une_formule = litFormuleString(lue);
+    }
+    
+    cout << "Analyse de " << lue << endl;
+    cout << formule2string(une_formule) << endl;
+    // NUMÉROTATION DES VARIABLES
+    numerote(une_formule, correspondance);
+    // TRADUCTION EN FORME CONJONCTIVE
+	formule *formule_clean = simplifie_formule(une_formule);
+	cout << formule2string(formule_clean) << endl;
+
+	
+	// LIBÉRATION DES ALLOCATIONS
+	detruire_formule(une_formule);
+	detruire_formule(formule_clean);
+	
+	return 0;
+//*/
+
