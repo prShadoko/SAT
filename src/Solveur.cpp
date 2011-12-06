@@ -162,7 +162,20 @@ char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs)
 	return (indetermine ? 0 : 1);
 }
 
-bool cherche(const forme_conjonctive &fc, const int id_valeurs, char *valeurs) {
-//	valeurs[id_var] = 1;
-	//TODO
+bool cherche(const forme_conjonctive &fc, const int id_var, char *valeurs) {
+	if(id_var >= valeurs.size()) {
+		return (forme_conj_satisfaite(fc, valeurs) == 1);
+	}
+	valeurs[id_vars] = 1;
+	if(cherche(fc, id_var+1, valeurs) {
+		return true;
+	} else {
+		valeurs[id_valeurs] = -1;
+		if(cherche(fc, id_var+1, valeurs)) {
+			return true;
+		} else {
+			valeurs[id_var] = 0;
+			return false;
+		}
+	}
 }
