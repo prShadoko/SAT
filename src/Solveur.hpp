@@ -20,5 +20,6 @@ extern forme_conjonctive etape_non(const forme_conjonctive &fc, const clause &cl
 extern forme_conjonctive trad_fc_non(const forme_conjonctive &fc);
 extern char clause_est_satisfaite(const clause &cl, const char *valeurs);
 extern char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs);
+extern bool cherche(const forme_conjonctive &fc, const int id_valeurs, char *valeurs);
 
 #endif

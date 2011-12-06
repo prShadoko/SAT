@@ -123,4 +123,49 @@ formule* equiv(formule* arg1, formule* arg2) {
     return mkbinop(o_equivaut,arg1,arg2);
 }
 
+void detruire_formule(formule *form) {
+	//TODO: Désallouer toutes les allocations d'une formule et de ses sous-formules
+}
+
+formule* conversion_implique(const formule *form) {
+/*
+	Précondition : form->op doit être o_implique
+	Retour : une nouvelle formule formée des opérateurs de base (et, ou, non)
+*/
+	formule *formule_res = new formule();
+
+	formule_res->arg1 = form->arg1;
+	formule_res->arg2 = form->arg2;
+	formule_res->arg1 = non(formule_res->arg1);
+	formule_res->op = o_ou;
+
+	return formule_res;
+}
+
+formule* conversion_equivaut(const formule *form) {
+/*
+	Précondition : form->op doit être o_equivaut
+	Retour : une nouvelle formule formée des opérateurs de base (et, ou, non)
+*/
+	formule *formule_gauche = new formule();
+	formule *formule_droite = new formule();
+	formule *formule_res = new formule();
+
+	formule_gauche->arg1 = form->arg1; 
+	formule_gauche->arg2 = form->arg2;
+	formule_gauche->op = o_implique;
+
+	formule_droite->op = o_implique;
+	formule_droite->arg1 = form->arg2; 
+	formule_droite->arg2 = form->arg1;
+
+	formule_res->op = o_et;
+	formule_res->arg1 = formule_gauche;
+	formule_res->arg2 = formule_droite;
+
+	conversion_implique(formule_res->arg1);
+	conversion_implique(formule_res->arg2);
+
+	return formule_res;
+}
 

@@ -24,10 +24,19 @@ void numerote(const formule* form, map<string, int> &correspondance) {
 
 forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, int> &correspondance) {
 	forme_conjonctive fc, fc1, fc2;
-	//TODO: À la descente, utiliser une formule temporaire pour modifier les => et <=>
-	if(is_binary(form->op)) {
-		fc1 = trad_forme_conjonctive(form->arg1, correspondance);
-		fc2 = trad_forme_conjonctive(form->arg2, correspondance);
+	formule *form_convertie = new formule();
+
+	if (is_binary(form->op)) {		
+		if (form->op == o_implique) {
+			form_convertie = conversion_implique(form);
+			forme_conjonctive(form_convertie);
+		} else if (form->op == o_equivaut) {
+			form_convertie = conversion_equivaut(form);
+			forme_conjonctive(form_convertie);
+		} else {
+			fc1 = trad_forme_conjonctive(form->arg1, correspondance);
+			fc2 = trad_forme_conjonctive(form->arg2, correspondance);
+		}
 	}
 	
 	switch(form->op) {
@@ -53,17 +62,20 @@ forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, int> &
 		{
 			fc = trad_fc_ou(fc1, fc2);
 			break;
-	  	}/*
-	  	case o_implique:
+	  	}
+/*
+		case o_implique:
+		{
+			fc = trad_fc_implique(fc1, fc2);
 	  		break;
-  		
+		}
   		case o_equivaut:
+		{
+			fc = trad_fc_equivaut(fc1, fc2);
   			break;
-  		*/
+//*/
 	}
 	return fc;
-	
-	
 }
 
 forme_conjonctive trad_fc_et(const forme_conjonctive &fc1, const forme_conjonctive &fc2) {
@@ -140,7 +152,7 @@ char clause_est_satisfaite(const clause &cl, const char *valeurs) {
 char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs) {
 	bool indetermine = false;
 	for(forme_conjonctive::const_iterator it=fc.begin(); it!=fc.end(); it++) {
-		char cl_satisfaite = clause_est_satisfaite(*it, valeurs)
+		char cl_satisfaite = clause_est_satisfaite(*it, valeurs);
 		if(cl_satisfaite < 0) {
 			return -1;
 		} else if(cl_satisfaite == 0) {
@@ -150,3 +162,7 @@ char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs)
 	return (indetermine ? 0 : 1);
 }
 
+bool cherche(const forme_conjonctive &fc, const int id_valeurs, char *valeurs) {
+//	valeurs[id_var] = 1;
+	//TODO
+}
