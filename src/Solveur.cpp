@@ -7,7 +7,7 @@
  * @param form La formule dont on veut numéroter les variables.
  * @param correspondance La table de correspondance.
  */
-void numerote(const formule *form, map<string, int> &correspondance) {
+void numerote(const formule *form, map<string, unsigned int> &correspondance) {
 	if (form->op == o_variable) {
 		if(correspondance.count(*(form->nom)) == 1) {
 			return;
@@ -118,7 +118,7 @@ formule* simplifie_formule(const formule *form, const bool negation) {
  * @see simplifie_formule(const formule*, const bool)
  */
 //TODO: correspondance.operator[] ajoute un élément à l'indice donné s'il n'y en a pas. À éviter.
-forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, int> &correspondance) {
+forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, unsigned int> &correspondance) {
 	forme_conjonctive fc_out, fc1, fc2;
 	if(is_binary(form->op)) {
 		fc1 = trad_forme_conjonctive(form->arg1, correspondance);
@@ -167,10 +167,15 @@ forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, int> &
 
 // ======================================= EXPLORATION DE L'ESPACE DE RECHERCHE
 
+/**
+ * 
+ * 
+ */
 char clause_est_satisfaite(const clause &cl, const char *valeurs) {
 	bool indetermine = false;
 	for(clause::const_iterator it=cl.begin(); it!=cl.end(); it++) {
-		int litteral = *it * valeurs[abs(*it)];
+		unsigned int indice = abs(*it) - 1;
+		int litteral = *it * valeurs[indice];
 		if(litteral > 0) {
 			return 1;
 		} else if(litteral == 0) {
@@ -180,6 +185,10 @@ char clause_est_satisfaite(const clause &cl, const char *valeurs) {
 	return (indetermine ? 0 : -1);
 }
 
+/**
+ * 
+ * 
+ */
 char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs) {
 	bool indetermine = false;
 	for(forme_conjonctive::const_iterator it=fc.begin(); it!=fc.end(); it++) {
@@ -193,23 +202,25 @@ char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs)
 	return (indetermine ? 0 : 1);
 }
 
-//TODO: valeurs.size() n'existe pas ! valeurs est un char* !!!
-/*
-bool cherche(const forme_conjonctive &fc, const int id_var, char *valeurs) {
-	if(id_var >= valeurs.size()) {
+/**
+ * 
+ * 
+ */
+bool cherche(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var) {
+	const int indice = id_var - 1;
+	if(indice >= nb_valeurs) {
 		return (forme_conj_est_satisfaite(fc, valeurs) == 1);
 	}
-	valeurs[id_var] = 1;
-	if(cherche(fc, id_var+1, valeurs)) {
+	valeurs[indice] = 1;
+	if(cherche(fc, valeurs, nb_valeurs, id_var+1)) {
 		return true;
 	} else {
-		valeurs[id_var] = -1;
-		if(cherche(fc, id_var+1, valeurs)) {
+		valeurs[indice] = -1;
+		if(cherche(fc, valeurs, nb_valeurs, id_var+1)) {
 			return true;
 		} else {
-			valeurs[id_var] = 0;
+			valeurs[indice] = 0;
 			return false;
 		}
 	}
 }
-//*/

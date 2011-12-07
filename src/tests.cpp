@@ -16,8 +16,8 @@
 	
 	fc = trad_fc_non(fc);
 
-	for(fc_it=fc.begin(); fc_it<fc.end(); fc_it++) {
-		for(cl_it=fc_it->begin(); cl_it<fc_it->end(); cl_it++) {
+	for(fc_it=fc.begin(); fc_it!=fc.end(); fc_it++) {
+		for(cl_it=fc_it->begin(); cl_it!=fc_it->end(); cl_it++) {
 			cout << *cl_it << "\t";
 		}
 		cout << endl;
@@ -35,8 +35,8 @@
 	fc.push_back(clause(1, -2));
 	fc = etape_non(fc, cl);
 
-	for(fc_it=fc.begin(); fc_it<fc.end(); fc_it++) {
-		for(cl_it=fc_it->begin(); cl_it<fc_it->end(); cl_it++) {
+	for(fc_it=fc.begin(); fc_it!=fc.end(); fc_it++) {
+		for(cl_it=fc_it->begin(); cl_it!=fc_it->end(); cl_it++) {
 			cout << *cl_it << " ";
 		}
 		cout << endl;
