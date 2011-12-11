@@ -51,6 +51,8 @@ int main(int argc, char** argv) {
 		for(unsigned int i=0; i<correspondance.size(); i++) {
 			cout << (char)(i + 97) << " = " << (valeurs[i] > 0 ? "Vrai" : "Faux") << endl;
 		}
+	} else {
+		cout << "La formule n'est pas satisfiable" << endl;
 	}
 	
 	// LIBÉRATION DES ALLOCATIONS
