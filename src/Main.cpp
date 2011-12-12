@@ -46,6 +46,9 @@ int main(int argc, char** argv) {
 //*/
 	// EXPLORATION DE L'ESPACE DE RECHERCHE
 	valeurs = new char[correspondance.size()];
+	for(unsigned int i=0; i<correspondance.size(); i++) {
+		valeurs[i] = 0;
+	}
 	if(cherche(fc, valeurs, correspondance.size())) {
 		cout << "La formule est satisfiable" << endl;
 		for(unsigned int i=0; i<correspondance.size(); i++) {
