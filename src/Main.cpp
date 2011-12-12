@@ -49,7 +49,8 @@ int main(int argc, char** argv) {
 	for(unsigned int i=0; i<correspondance.size(); i++) {
 		valeurs[i] = 0;
 	}
-	if(cherche(fc, valeurs, correspondance.size())) {
+	// cherche1 pour la première version de la fonction cherche
+	if(cherche2(fc, valeurs, correspondance.size())) {
 		cout << "La formule est satisfiable" << endl;
 		for(unsigned int i=0; i<correspondance.size(); i++) {
 			cout << (char)(i + 97) << " = " << (valeurs[i] > 0 ? "Vrai" : "Faux") << endl;

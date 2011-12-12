@@ -17,6 +17,7 @@ extern formule* simplifie_formule(const formule *form, const bool negation = fal
 extern forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, unsigned int> &correspondance);
 extern char clause_est_satisfaite(const clause &cl, const char *valeurs);
 extern char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs);
-extern bool cherche(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var = 1);
+extern bool cherche1(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var = 1);
+extern bool cherche2(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var = 1);
 
 #endif

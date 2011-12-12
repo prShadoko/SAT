@@ -206,17 +206,17 @@ char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs)
  * 
  * 
  */
-bool cherche(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var) {
+bool cherche1(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var) {
 	const int indice = id_var - 1;
 	if(indice >= nb_valeurs) {
 		return (forme_conj_est_satisfaite(fc, valeurs) == 1);
 	}
 	valeurs[indice] = 1;
-	if(cherche(fc, valeurs, nb_valeurs, id_var+1)) {
+	if(cherche1(fc, valeurs, nb_valeurs, id_var+1)) {
 		return true;
 	} else {
 		valeurs[indice] = -1;
-		if(cherche(fc, valeurs, nb_valeurs, id_var+1)) {
+		if(cherche1(fc, valeurs, nb_valeurs, id_var+1)) {
 			return true;
 		} else {
 			valeurs[indice] = 0;
@@ -224,3 +224,30 @@ bool cherche(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_v
 		}
 	}
 }
+
+/**
+ * 
+ * 
+ */
+bool cherche2(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var) {
+	const int indice = id_var - 1;
+	
+	for(valeurs[indice]=1; valeurs[indice]>=-1; valeurs[indice] -= 2) { // 1,-1
+		if(forme_conj_est_satisfaite(fc, valeurs) == 1) {
+			return true;
+		}
+		if(id_var < nb_valeurs) { // S'il reste des variables indéfinies
+			if(cherche2(fc, valeurs, nb_valeurs, id_var + 1)) {
+				return true;
+			}
+		}
+	}
+	
+	valeurs[indice] = 0;
+	return false;
+}
+
+
+
+
+
