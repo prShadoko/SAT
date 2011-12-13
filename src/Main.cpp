@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     map<string, unsigned int> correspondance;
     forme_conjonctive fc;
     char *valeurs = NULL;
-    
+
     // LECTURE DE LA FORMULE
     if (argc >= 2) {
         lue = string(argv[1]);
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
         lue = buffer.str();
         une_formule = litFormuleString(lue);
     }
-    
+
     cout << "Analyse de " << lue << endl;
     cout << formule2string(une_formule) << endl;
     // NUMÉROTATION DES VARIABLES
@@ -52,17 +52,24 @@ int main(int argc, char** argv) {
 	// cherche1 pour la première version de la fonction cherche
 	if(cherche2(fc, valeurs, correspondance.size())) {
 		cout << "La formule est satisfiable" << endl;
-		for(unsigned int i=0; i<correspondance.size(); i++) {
-			cout << (char)(i + 97) << " = " << (valeurs[i] > 0 ? "Vrai" : "Faux") << endl;
+		for(unsigned int i=1; i<=correspondance.size(); i++) {
+			for(map<string, unsigned int>::const_iterator it=correspondance.begin(); it!=correspondance.end(); it++) {
+				if(it->second == i) {
+					cout.width(4);
+					cout << left << it->first;
+					break;
+				}
+			}
+			cout << " = " << (valeurs[i] > 0 ? "Vrai" : "Faux") << endl;
 		}
 	} else {
 		cout << "La formule n'est pas satisfiable" << endl;
 	}
-	
+
 	// LIBÉRATION DES ALLOCATIONS
 	delete[] valeurs;
 	detruire_formule(une_formule);
 	detruire_formule(formule_simplifiee);
-	
+
 	return 0;
 }
