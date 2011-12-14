@@ -11,6 +11,10 @@ using namespace std;
 
 typedef vector<int> clause;
 typedef vector<clause> forme_conjonctive;
+struct listes_clauses {
+	vector< vector<clause*> > pos;
+	vector< vector<clause*> > neg;
+};
 
 extern void numerote(const formule* form, map<string, unsigned int> &correspondance);
 extern formule* simplifie_formule(const formule *form, const bool negation = false);
