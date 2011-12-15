@@ -117,7 +117,6 @@ formule* simplifie_formule(const formule *form, const bool negation) {
  * @see forme_conjonctive
  * @see simplifie_formule(const formule*, const bool)
  */
-//TODO: correspondance.operator[] ajoute un élément à l'indice donné s'il n'y en a pas. À éviter.
 forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, unsigned int> &correspondance) {
 	forme_conjonctive fc_out, fc1, fc2;
 	if(is_binary(form->op)) {
@@ -168,31 +167,36 @@ forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, unsign
 // ======================================= EXPLORATION DE L'ESPACE DE RECHERCHE
 
 /**
- *
- *
+ * Évalue la valeur de vérité d'une clause selon une interprétation.
+ * @param cl La clause à évaluer.
+ * @param interpretation L'interprétation selon laquelle la clause sera évaluée.
+ * @return -1 si la clause est évaluée à FAUX. 1 si elle est évaluée à VRAI. 0 si elle est indéterminée.
  */
-char clause_est_satisfaite(const clause &cl, const char *valeurs) {
+short int clause_est_satisfaite(const clause &cl, const short int *interpretation) {
 	bool indetermine = false;
 	for(clause::const_iterator it=cl.begin(); it!=cl.end(); it++) {
 		unsigned int indice = abs(*it) - 1;
-		int litteral = *it * valeurs[indice];
+		int litteral = *it * interpretation[indice];
 		if(litteral > 0) {
 			return 1;
 		} else if(litteral == 0) {
 			indetermine = true;
 		}
 	}
+
 	return (indetermine ? 0 : -1);
 }
 
 /**
  *
- *
+ * @param fc
+ * @param interpretation
+ * @return
  */
-char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs) {
+short int forme_conj_est_satisfaite(const forme_conjonctive &fc, const short int *interpretation) {
 	bool indetermine = false;
 	for(forme_conjonctive::const_iterator it=fc.begin(); it!=fc.end(); it++) {
-		char cl_satisfaite = clause_est_satisfaite(*it, valeurs);
+		short int cl_satisfaite = clause_est_satisfaite(*it, interpretation);
 		if(cl_satisfaite < 0) {
 			return -1;
 		} else if(cl_satisfaite == 0) {
@@ -204,22 +208,26 @@ char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs)
 
 /**
  *
- *
+ * @param fc
+ * @param interpretation
+ * @param nb_var
+ * @param id_var
+ * @return
  */
-bool cherche1(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var) {
+bool cherche1(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var) {
 	const int indice = id_var - 1;
-	if(indice >= nb_valeurs) {
-		return (forme_conj_est_satisfaite(fc, valeurs) == 1);
+	if(indice >= nb_var) {
+		return (forme_conj_est_satisfaite(fc, interpretation) == 1);
 	}
-	valeurs[indice] = 1;
-	if(cherche1(fc, valeurs, nb_valeurs, id_var+1)) {
+	interpretation[indice] = 1;
+	if(cherche1(fc, interpretation, nb_var, id_var+1)) {
 		return true;
 	} else {
-		valeurs[indice] = -1;
-		if(cherche1(fc, valeurs, nb_valeurs, id_var+1)) {
+		interpretation[indice] = -1;
+		if(cherche1(fc, interpretation, nb_var, id_var+1)) {
 			return true;
 		} else {
-			valeurs[indice] = 0;
+			interpretation[indice] = 0;
 			return false;
 		}
 	}
@@ -227,43 +235,116 @@ bool cherche1(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_
 
 /**
  *
- *
+ * @param fc
+ * @param interpretation
+ * @param nb_var
+ * @param id_var
+ * @return
  */
-bool cherche2(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var) {
+bool cherche2(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var) {
 	const int indice = id_var - 1;
 
-	for(valeurs[indice]=1; valeurs[indice]>=-1; valeurs[indice] -= 2) { // 1,-1
-		if(forme_conj_est_satisfaite(fc, valeurs) == 1) {
+	for(interpretation[indice]=1; interpretation[indice]>=-1; interpretation[indice] -= 2) { // 1,-1
+		if(forme_conj_est_satisfaite(fc, interpretation) == 1) {
 			return true;
 		}
-		if(id_var < nb_valeurs) { // S'il reste des variables indéfinies
-			if(cherche2(fc, valeurs, nb_valeurs, id_var + 1)) {
+		if(id_var < nb_var) { // S'il reste des variables indéfinies
+			if(cherche2(fc, interpretation, nb_var, id_var + 1)) {
 				return true;
 			}
 		}
 	}
 
-	valeurs[indice] = 0;
+	interpretation[indice] = 0;
 	return false;
 }
 
 /**
  *
- *
+ * @param fc
+ * @param interpretation
+ * @param nb_var
+ * @param index
+ * @param id_var
+ * @return
  */
- listes_clauses indexeClauses(const forme_conjonctive &fc) {
- 	listes_clauses lc;
-	for(forme_conjonctive::const_iterator it_fc=fc.begin(); it_fc!=fc.end(); it_++) {
-		for(clause::const_iterator it_cl=it_fc->begin(); it_cl!=it_fc->end(); it++) {
-			if(*it_cl < 0) {
-				lc.neg[-(*it_cl)].push_back(&(*it_fc));
+bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
+//*
+	const int indice = id_var - 1;
+	for(interpretation[indice]=1; interpretation[indice]>=-1; interpretation[indice] -= 2) { // 1,-1
+		if(!contientInsatisfaite(id_var, interpretation, index)) {
+			if(id_var < nb_var) { // S'il reste des variables indéfinies
+				if(cherche3(fc, interpretation, nb_var, index, id_var + 1)) {
+					return true;
+				}
 			} else {
-				lc.pos[*it_cl].push_back(&(*it_fc));
+				return true;
 			}
 		}
 	}
-	return lc;
+
+	interpretation[indice] = 0;
+	return false;
+
 }
 
+/**
+ * Indexe les clauses selon les littéraux qu'elles contiennent.
+ * @param fc La forme conjonctive dont on indexe les clauses.
+ * @return L'index des clauses.
+ */
+index_clauses indexeClauses(forme_conjonctive &fc) {
+ 	index_clauses index;
+	for(forme_conjonctive::iterator it_fc=fc.begin(); it_fc!=fc.end(); it_fc++) {
+		for(clause::iterator it_cl=it_fc->begin(); it_cl!=it_fc->end(); it_cl++) {
+			if(*it_cl < 0) {
+				index.neg[-(*it_cl)].push_back(&(*it_fc));
+			} else {
+				index.pos[*it_cl].push_back(&(*it_fc));
+			}
+		}
+	}
+	return index;
+}
 
+/**
+ * Détermine si l'une des clauses de la formule est insatisfaite par une interprétation donnée.
+ * @param id_var La variable par rapport à laquelle on évalue la satisfaction de la formule.
+ * @param interpretation L'interprétation selon laquelle les clauses seront évaluées.
+ * @param index L'index des clauses de la formule.
+ * @return VRAI si l'une des clauses n'est pas satisfiable avec l'interprétation donnée. FAUX sinon.
+ */
+bool contientInsatisfaite(const unsigned int id_var, const short int *interpretation, const index_clauses &index) {
 
+	unsigned int indice = id_var - 1;
+	map< unsigned int, vector<clause*> >::const_iterator it_clauses;
+	vector<clause*> clauses;
+	if(interpretation[indice] == 0) {
+
+		return false;
+	}
+
+	if(interpretation[indice] > 0) {
+
+		if((it_clauses = index.neg.find(id_var)) == index.neg.end()) {
+			return false;
+		} else {
+			clauses = it_clauses->second;
+		}
+	} else {
+		if((it_clauses = index.pos.find(id_var)) == index.pos.end()) {
+			return false;
+		} else {
+			clauses = it_clauses->second;
+		}
+	}
+
+	for(vector<clause*>::const_iterator it=it_clauses->second.begin(); it!=it_clauses->second.end(); it++) {
+		if(clause_est_satisfaite((**it), interpretation) == -1) {
+
+			return true;
+		}
+	}
+
+	return false;
+}

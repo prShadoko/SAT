@@ -11,17 +11,20 @@ using namespace std;
 
 typedef vector<int> clause;
 typedef vector<clause> forme_conjonctive;
-struct listes_clauses {
-	vector< vector<clause*> > pos;
-	vector< vector<clause*> > neg;
+struct index_clauses {
+	map< unsigned int, vector<clause*> > pos;
+	map< unsigned int, vector<clause*> > neg;
 };
 
 extern void numerote(const formule* form, map<string, unsigned int> &correspondance);
 extern formule* simplifie_formule(const formule *form, const bool negation = false);
 extern forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, unsigned int> &correspondance);
-extern char clause_est_satisfaite(const clause &cl, const char *valeurs);
-extern char forme_conj_est_satisfaite(const forme_conjonctive &fc, const char *valeurs);
-extern bool cherche1(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var = 1);
-extern bool cherche2(const forme_conjonctive &fc, char *valeurs, const unsigned int nb_valeurs, const unsigned int id_var = 1);
+extern short int clause_est_satisfaite(const clause &cl, const short int *interpretation);
+extern short int forme_conj_est_satisfaite(const forme_conjonctive &fc, const short int *interpretation);
+extern bool cherche1(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var = 1);
+extern bool cherche2(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var = 1);
+extern bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var = 1);
+extern index_clauses indexeClauses(forme_conjonctive &fc);
+extern bool contientInsatisfaite(const unsigned int id_var, const short int *interpretation, const index_clauses &index);
 
 #endif

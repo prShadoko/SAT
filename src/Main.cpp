@@ -10,10 +10,12 @@ int main(int argc, char** argv) {
 	// DÉCLARATION DES VARIABLES
     formule *une_formule;
     formule *formule_simplifiee;
+    unsigned int nb_var;
     string lue;
     map<string, unsigned int> correspondance;
     forme_conjonctive fc;
-    char *valeurs = NULL;
+    short int *interpretation = NULL;
+    index_clauses index;
 
     // LECTURE DE LA FORMULE
     if (argc >= 2) {
@@ -30,6 +32,7 @@ int main(int argc, char** argv) {
     cout << formule2string(une_formule) << endl;
     // NUMÉROTATION DES VARIABLES
     numerote(une_formule, correspondance);
+    nb_var = correspondance.size();
     // TRADUCTION EN FORME CONJONCTIVE
 	formule_simplifiee = simplifie_formule(une_formule);
 	cout << "Formule simplifiée :" << endl << formule2string(formule_simplifiee) << endl;
@@ -38,19 +41,25 @@ int main(int argc, char** argv) {
 	forme_conjonctive::const_iterator fc_it;
 	clause::const_iterator cl_it;
 	for(fc_it=fc.begin(); fc_it!=fc.end(); fc_it++) {
+		cout << "[";
 		for(cl_it=fc_it->begin(); cl_it!=fc_it->end(); cl_it++) {
-			cout << *cl_it << "\t";
+			cout.width(5);
+			cout << *cl_it;
 		}
-		cout << endl;
+		cout << " ]" << endl;
 	}
 //*/
 	// EXPLORATION DE L'ESPACE DE RECHERCHE
-	valeurs = new char[correspondance.size()];
-	for(unsigned int i=0; i<correspondance.size(); i++) {
-		valeurs[i] = 0;
+	interpretation = new short int[nb_var];
+	for(unsigned int i=0; i<nb_var; i++) {
+		interpretation[i] = 0;
 	}
-	// cherche1 pour la première version de la fonction cherche
-	if(cherche2(fc, valeurs, correspondance.size())) {
+
+	index = indexeClauses(fc);
+
+//	if(cherche1(fc, interpretation, nb_var)) {
+//	if(cherche2(fc, interpretation, nb_var)) {
+	if(cherche3(fc, interpretation, nb_var, index)) {
 		cout << "La formule est satisfiable" << endl;
 		for(unsigned int i=1; i<=correspondance.size(); i++) {
 			for(map<string, unsigned int>::const_iterator it=correspondance.begin(); it!=correspondance.end(); it++) {
@@ -60,14 +69,22 @@ int main(int argc, char** argv) {
 					break;
 				}
 			}
-			cout << " = " << (valeurs[i] > 0 ? "Vrai" : "Faux") << endl;
+			cout << " = ";
+			if(interpretation[i-1] > 0) {
+				cout << "Vrai";
+			} else if(interpretation[i-1] < 0) {
+				cout << "Faux";
+			} else {
+				cout << "?";
+			}
+			cout << endl;
 		}
 	} else {
 		cout << "La formule n'est pas satisfiable" << endl;
 	}
 
 	// LIBÉRATION DES ALLOCATIONS
-	delete[] valeurs;
+	delete[] interpretation;
 	detruire_formule(une_formule);
 	detruire_formule(formule_simplifiee);
 
