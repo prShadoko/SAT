@@ -59,8 +59,12 @@ int main(int argc, char** argv) {
 
 //	if(cherche1(fc, interpretation, nb_var)) {
 //	if(cherche2(fc, interpretation, nb_var)) {
+<<<<<<< HEAD
 //	if(cherche3(fc, interpretation, nb_var, index)) {
 	if(cherche4(fc, interpretation, nb_var, index)) {
+=======
+	if(cherche3(fc, interpretation, nb_var, index)) {
+>>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
 		cout << "La formule est satisfiable" << endl;
 		for(unsigned int i=1; i<=correspondance.size(); i++) {
 			for(map<string, unsigned int>::const_iterator it=correspondance.begin(); it!=correspondance.end(); it++) {

@@ -288,6 +288,7 @@ bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsi
 
 }
 
+<<<<<<< HEAD
 bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
 //*
 	const int indice = id_var - 1;
@@ -311,6 +312,8 @@ bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsi
 
 }
 
+=======
+>>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
 /**
  * Indexe les clauses selon les littéraux qu'elles contiennent.
  * @param fc La forme conjonctive dont on indexe les clauses.
@@ -371,6 +374,7 @@ bool contientInsatisfaite(const unsigned int id_var, const short int *interpreta
 
 	return false;
 }
+<<<<<<< HEAD
 
 bool propage(const unsigned int id_var, const short int *interpretation, const index_clauses &index, vector<int> &deduites) {
 
@@ -423,3 +427,5 @@ bool propage(const unsigned int id_var, const short int *interpretation, const i
 
 	return false;
 }
+=======
+>>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
