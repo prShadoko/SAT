@@ -303,8 +303,10 @@ bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsi
 			}
 		}
 	}
-
-	interpretation[indice] = 0;
+	
+	for(vector<int>::iterator it_ded=deduites.begin(); it_ded!=deduites.end(); it_ded++) {
+		interpretation[(*it_ded)-1] = 0;
+	}
 	return false;
 
 }
