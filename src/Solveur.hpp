@@ -27,6 +27,6 @@ extern bool cherche3(const forme_conjonctive &fc, short int *interpretation, con
 extern bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var = 1);
 extern index_clauses indexeClauses(forme_conjonctive &fc);
 extern bool contientInsatisfaite(const unsigned int id_var, const short int *interpretation, const index_clauses &index);
-extern bool propage(const unsigned int id_var, const short int *interpretation, const index_clauses &index, vector<int> &deduites);
+extern bool propage(const unsigned int id_var, short int *interpretation, const index_clauses &index, vector<unsigned int> &deduites);
 
 #endif

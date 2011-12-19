@@ -269,7 +269,6 @@ bool cherche2(const forme_conjonctive &fc, short int *interpretation, const unsi
  * @return
  */
 bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
-//*
 	const int indice = id_var - 1;
 	for(interpretation[indice]=1; interpretation[indice]>=-1; interpretation[indice] -= 2) { // 1,-1
 		if(!contientInsatisfaite(id_var, interpretation, index)) {
@@ -288,10 +287,18 @@ bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsi
 
 }
 
+/**
+ *
+ * @param fc
+ * @param interpretation
+ * @param nb_var
+ * @param index
+ * @param id_var
+ * @return
+ */
 bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
-//*
 	const int indice = id_var - 1;
-	vector<int> deduites;
+	vector<unsigned int> deduites;
 	for(interpretation[indice]=1; interpretation[indice]>=-1; interpretation[indice] -= 2) { // 1,-1
 		if(!propage(id_var, interpretation, index, deduites)) {
 			if(id_var < nb_var) { // S'il reste des variables indéfinies
@@ -304,7 +311,7 @@ bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsi
 		}
 	}
 
-	for(vector<int>::iterator it_ded=deduites.begin(); it_ded!=deduites.end(); it_ded++) {
+	for(vector<unsigned int>::iterator it_ded=deduites.begin(); it_ded!=deduites.end(); it_ded++) {
 		interpretation[(*it_ded)-1] = 0;
 	}
 	return false;
@@ -343,28 +350,22 @@ bool contientInsatisfaite(const unsigned int id_var, const short int *interpreta
 	map< unsigned int, vector<clause*> >::const_iterator it_clauses;
 	vector<clause*> clauses;
 	if(interpretation[indice] == 0) {
-
 		return false;
 	}
 
 	if(interpretation[indice] > 0) {
-
 		if((it_clauses = index.neg.find(id_var)) == index.neg.end()) {
 			return false;
-		} else {
-			clauses = it_clauses->second;
 		}
 	} else {
 		if((it_clauses = index.pos.find(id_var)) == index.pos.end()) {
 			return false;
-		} else {
-			clauses = it_clauses->second;
 		}
 	}
+	clauses = it_clauses->second;
 
 	for(vector<clause*>::const_iterator it=it_clauses->second.begin(); it!=it_clauses->second.end(); it++) {
 		if(clause_est_satisfaite((**it), interpretation) == -1) {
-
 			return true;
 		}
 	}
@@ -372,52 +373,58 @@ bool contientInsatisfaite(const unsigned int id_var, const short int *interpreta
 	return false;
 }
 
-bool propage(const unsigned int id_var, const short int *interpretation, const index_clauses &index, vector<int> &deduites) {
-
+/**
+ *
+ * @param id_var La variable par rapport à laquelle on évalue la satisfaction de la formule.
+ * @param interpretation L'interprétation selon laquelle les clauses seront évaluées.
+ * @param index L'index des clauses de la formule.
+ * @param deduites La liste des variables dont la valeurs est déduites des précédentes affectations.
+ * @return VRAI si l'une des clauses n'est pas satisfiable avec l'interprétation donnée. FAUX sinon.
+ */
+bool propage(const unsigned int id_var, short int *interpretation, const index_clauses &index, vector<unsigned int> &deduites) {
 	unsigned int indice = id_var - 1;
+	int litt_var_suiv = 0;
+	short int clause_satisfaite;
 	map< unsigned int, vector<clause*> >::const_iterator it_clauses;
 	vector<clause*> clauses;
-	vector<int>::iterator it_litt;
-	int nb_litt, nb_litt_ind, nb_litt_neg, id_ind;
 
 	if(interpretation[indice] == 0) {
-
-		clauses = it_clauses->second;
+		return false;
 	}
 
 	if(interpretation[indice] > 0) {
-
 		if((it_clauses = index.neg.find(id_var)) == index.neg.end()) {
 			return false;
-		} else {
-			clauses = it_clauses->second;
 		}
 	} else {
 		if((it_clauses = index.pos.find(id_var)) == index.pos.end()) {
 			return false;
-		} else {
-			clauses = it_clauses->second;
 		}
 	}
+	clauses = it_clauses->second;
 
 	for(vector<clause*>::const_iterator it=it_clauses->second.begin(); it!=it_clauses->second.end(); it++) {
-		for(it_litt=(*it)->begin(); it_litt!=(*it)->end(); it_litt++) {
-			nb_litt++;
-			if(interpretation[*it_litt-1] == -1) {
-				nb_litt_neg++;
-			}
-			if(interpretation[*it_litt-1] == 0) {
-				nb_litt_ind++;
-				id_ind = *it_litt;
-			}
-		}
-		if(nb_litt == nb_litt_neg+nb_litt_ind && nb_litt_ind == 1) {
-			deduites.push_back(*it_litt);
-			return propage(id_ind, interpretation, index, deduites);
-		}
-		if(clause_est_satisfaite((**it), interpretation) == -1) {
-
+		clause_satisfaite = clause_est_satisfaite((**it), interpretation);
+		if(clause_satisfaite == -1) { // clause insatisfaite
 			return true;
+		} else if(clause_satisfaite == 0) { // clause indeterminée
+			for(vector<int>::iterator it_litt=(*it)->begin(); it_litt!=(*it)->end(); it_litt++) {
+				if(interpretation[abs(*it_litt)-1] == 0) {
+					if(litt_var_suiv == 0) { // 1° variable indéterminée
+						litt_var_suiv = *it_litt;
+					} else { // 2° variable indéterminée -> pas de propagation possible
+						litt_var_suiv = 0;
+						break;
+					}
+				}
+			}
+		}
+
+		if(litt_var_suiv != 0) { // propagation
+			unsigned int id_var_suiv = abs(litt_var_suiv);
+			deduites.push_back(id_var_suiv);
+			interpretation[id_var_suiv-1] = litt_var_suiv / id_var_suiv;
+			propage(id_var_suiv, interpretation, index, deduites);
 		}
 	}
 
