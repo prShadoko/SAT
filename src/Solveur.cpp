@@ -6,6 +6,7 @@
  * Numérote les variables d'une formule.
  * @param form La formule dont on veut numéroter les variables.
  * @param correspondance La table de correspondance.
+ * @see formule
  */
 void numerote(const formule *form, map<string, unsigned int> &correspondance) {
 	if (form->op == o_variable) {
@@ -34,6 +35,7 @@ void numerote(const formule *form, map<string, unsigned int> &correspondance) {
  * @param form La formule à simplifier.
  * @param negation Indique si l'élément parent était un NON. Vaut false par défaut.
  * @return La formule simplifiée.
+ * @see formule
  */
 formule* simplifie_formule(const formule *form, const bool negation) {
 	formule *form_out = NULL;
@@ -167,10 +169,11 @@ forme_conjonctive trad_forme_conjonctive(const formule *form, map<string, unsign
 // ======================================= EXPLORATION DE L'ESPACE DE RECHERCHE
 
 /**
- * Évalue la valeur de vérité d'une clause selon une interprétation.
+ * Évalue la valeur de vérité d'une clause selon une interprétation donnée.
  * @param cl La clause à évaluer.
  * @param interpretation L'interprétation selon laquelle la clause sera évaluée.
  * @return -1 si la clause est évaluée à FAUX. 1 si elle est évaluée à VRAI. 0 si elle est indéterminée.
+ * @see forme_conj_est_satisfaite(const forme_conjonctive&, const short int*)
  */
 short int clause_est_satisfaite(const clause &cl, const short int *interpretation) {
 	bool indetermine = false;
@@ -188,10 +191,11 @@ short int clause_est_satisfaite(const clause &cl, const short int *interpretatio
 }
 
 /**
- *
- * @param fc
- * @param interpretation
- * @return
+ * Évalue la valeur de vérité d'une forme conjonctive selon une interprétation donnée.
+ * @param fc La forme conjonctive à évaluer.
+ * @param interpretation L'interprétation selon laquelle la forme conjonctive sera évaluée.
+ * @return -1 si la forme conjonctive est évaluée à FAUX. 1 si elle est évaluée à VRAI. 0 si elle est indéterminée.
+ * @see clause_est_satisfaite(const clause&, const short int*)
  */
 short int forme_conj_est_satisfaite(const forme_conjonctive &fc, const short int *interpretation) {
 	bool indetermine = false;
@@ -207,12 +211,17 @@ short int forme_conj_est_satisfaite(const forme_conjonctive &fc, const short int
 }
 
 /**
- *
- * @param fc
- * @param interpretation
- * @param nb_var
- * @param id_var
- * @return
+ * Cherche une interprétation pour laquelle la forme conjonctive est satisfaite.
+ * S'appelle récursivement pour tester toutes les interprétations possibles.
+ * Si la fonction retourne VRAI, le paramètre interprétation contient l'interprétation satisfaisant la forme conjonctive.
+ * @param fc La forme conjonctive à évaluer.
+ * @param interpretation L'interprétation courante.
+ * @param nb_var Le nombre de variables de la formule.
+ * @param id_var Le numéro de la variable en cours de traitement. Ce paramètre DOIT ÊTRE OMIS ou mis à sa valeur par défaut : 1.
+ * @return VRAI si la forme conjonctive est satisfiable. FAUX sinon.
+ * @see cherche2(const forme_conjonctive&, short int*, const unsigned int, const unsigned int)
+ * @see cherche3(const forme_conjonctive&, short int*, const unsigned int, const index_clauses&, const unsigned int)
+ * @see cherche4(const forme_conjonctive&, short int*, const unsigned int, const index_clauses&, const unsigned int)
  */
 bool cherche1(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var) {
 	const int indice = id_var - 1;
@@ -234,12 +243,18 @@ bool cherche1(const forme_conjonctive &fc, short int *interpretation, const unsi
 }
 
 /**
- *
- * @param fc
- * @param interpretation
- * @param nb_var
- * @param id_var
- * @return
+ * Cherche une interprétation pour laquelle la forme conjonctive est satisfaite.
+ * S'appelle récursivement pour tester les interprétations possibles.
+ * Si l'affectation d'une valeur à une variable rend la formule insatisfiable, toutes les interprétations utilisant cette affectation sont ignorées.
+ * Si la fonction retourne VRAI, le paramètre interprétation contient l'interprétation satisfaisant la forme conjonctive.
+ * @param fc La forme conjonctive à évaluer.
+ * @param interpretation L'interprétation courante.
+ * @param nb_var Le nombre de variables de la formule.
+ * @param id_var Le numéro de la variable en cours de traitement. Ce paramètre DOIT ÊTRE OMIS ou mis à sa valeur par défaut : 1.
+ * @return VRAI si la forme conjonctive est satisfiable. FAUX sinon.
+ * @see cherche1(const forme_conjonctive&, short int*, const unsigned int, const unsigned int)
+ * @see cherche3(const forme_conjonctive&, short int *, const unsigned int, const index_clauses&, const unsigned int)
+ * @see cherche4(const forme_conjonctive&, short int *, const unsigned int, const index_clauses&, const unsigned int)
  */
 bool cherche2(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var) {
 	const int indice = id_var - 1;
@@ -260,13 +275,19 @@ bool cherche2(const forme_conjonctive &fc, short int *interpretation, const unsi
 }
 
 /**
- *
- * @param fc
- * @param interpretation
- * @param nb_var
- * @param index
- * @param id_var
- * @return
+ * Cherche une interprétation pour laquelle la forme conjonctive est satisfaite.
+ * S'appelle récursivement pour tester les interprétations possibles.
+ * Si l'affectation d'une valeur à une variable rend la formule insatisfiable, toutes les interprétations utilisant cette affectation sont ignorées.
+ * Si la fonction retourne VRAI, le paramètre interprétation contient l'interprétation satisfaisant la forme conjonctive.
+ * @param fc La forme conjonctive à évaluer.
+ * @param interpretation L'interprétation courante.
+ * @param nb_var Le nombre de variables de la formule.
+ * @param index L'index des clauses selon les littéraux qu'elles contiennent.
+ * @param id_var Le numéro de la variable en cours de traitement. Ce paramètre DOIT ÊTRE OMIS ou mis à sa valeur par défaut : 1.
+ * @return VRAI si la forme conjonctive est satisfiable. FAUX sinon.
+ * @see cherche1(const forme_conjonctive&, short int*, const unsigned int, const unsigned int)
+ * @see cherche2(const forme_conjonctive&, short int*, const unsigned int, const unsigned int)
+ * @see cherche4(const forme_conjonctive&, short int *, const unsigned int, const index_clauses&, const unsigned int)
  */
 bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
 	const int indice = id_var - 1;
@@ -288,13 +309,19 @@ bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsi
 }
 
 /**
- *
- * @param fc
- * @param interpretation
- * @param nb_var
- * @param index
- * @param id_var
- * @return
+ * Cherche une interprétation pour laquelle la forme conjonctive est satisfaite.
+ * S'appelle récursivement pour tester les interprétations possibles.
+ * Si l'affectation d'une valeur à une variable rend la formule insatisfiable, toutes les interprétations utilisant cette affectation sont ignorées.
+ * Si la fonction retourne VRAI, le paramètre interprétation contient l'interprétation satisfaisant la forme conjonctive.
+ * @param fc La forme conjonctive à évaluer.
+ * @param interpretation L'interprétation courante.
+ * @param nb_var Le nombre de variables de la formule.
+ * @param index L'index des clauses selon les littéraux qu'elles contiennent.
+ * @param id_var Le numéro de la variable en cours de traitement. Ce paramètre DOIT ÊTRE OMIS ou mis à sa valeur par défaut : 1.
+ * @return VRAI si la forme conjonctive est satisfiable. FAUX sinon.
+ * @see cherche1(const forme_conjonctive&, short int*, const unsigned int, const unsigned int)
+ * @see cherche2(const forme_conjonctive&, short int*, const unsigned int, const unsigned int)
+ * @see cherche3(const forme_conjonctive&, short int *, const unsigned int, const index_clauses&, const unsigned int)
  */
 bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
 	const int indice = id_var - 1;
@@ -319,9 +346,12 @@ bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsi
 }
 
 /**
- * Indexe les clauses selon les littéraux qu'elles contiennent.
+ * Indexe les clauses d'une forme conjonctive selon les littéraux qu'elles contiennent.
  * @param fc La forme conjonctive dont on indexe les clauses.
  * @return L'index des clauses.
+ * @see index_clauses
+ * @see contientInsatisfaite(const unsigned int, const short int*, const index_clauses&)
+ * @see propage(const unsigned int, short int*, const index_clauses&, vector<unsigned int>&)
  */
 index_clauses indexeClauses(forme_conjonctive &fc) {
  	index_clauses index;
@@ -338,11 +368,14 @@ index_clauses indexeClauses(forme_conjonctive &fc) {
 }
 
 /**
- * Détermine si l'une des clauses de la formule est insatisfaite par une interprétation donnée.
- * @param id_var La variable par rapport à laquelle on évalue la satisfaction de la formule.
+ * Détermine si l'une des clauses de la formule est insatisfaite selon une interprétation donnée.
+ * @param id_var La variable dont on veut tester si elle rend la formule insatisfiable.
  * @param interpretation L'interprétation selon laquelle les clauses seront évaluées.
  * @param index L'index des clauses de la formule.
  * @return VRAI si l'une des clauses n'est pas satisfiable avec l'interprétation donnée. FAUX sinon.
+ * @see indexeClauses(forme_conjonctive&)
+ * @see propage(const unsigned int, short int*, const index_clauses&, vector<unsigned int>&)
+ * @see cherche3(const forme_conjonctive&, short int *, const unsigned int, const index_clauses&, const unsigned int)
  */
 bool contientInsatisfaite(const unsigned int id_var, const short int *interpretation, const index_clauses &index) {
 
@@ -374,12 +407,16 @@ bool contientInsatisfaite(const unsigned int id_var, const short int *interpreta
 }
 
 /**
- *
- * @param id_var La variable par rapport à laquelle on évalue la satisfaction de la formule.
+ * Détermine si l'une des clauses de la formule est insatisfaite selon une interprétation donnée et effectue la propagation des valeurs qui peuvent être déduites.
+ * Si la valeur de vérité de l'une des clauses est indéterminée et que la valeur d'une seule variable n'est pas définie, elle est définie à VRAI.
+ * @param id_var La variable dont on veut tester si elle rend la formule insatisfiable.
  * @param interpretation L'interprétation selon laquelle les clauses seront évaluées.
  * @param index L'index des clauses de la formule.
- * @param deduites La liste des variables dont la valeurs est déduites des précédentes affectations.
+ * @param deduites La liste des variables dont la valeur est déduite des précédentes affectations.
  * @return VRAI si l'une des clauses n'est pas satisfiable avec l'interprétation donnée. FAUX sinon.
+ * @see indexeClauses(forme_conjonctive&)
+ * @see contientInsatisfaite(const unsigned int, const short int*, const index_clauses&)
+ * @see cherche4(const forme_conjonctive&, short int *, const unsigned int, const index_clauses&, const unsigned int)
  */
 bool propage(const unsigned int id_var, short int *interpretation, const index_clauses &index, vector<unsigned int> &deduites) {
 	unsigned int indice = id_var - 1;
