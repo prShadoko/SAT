@@ -288,7 +288,6 @@ bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsi
 
 }
 
-<<<<<<< HEAD
 bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
 //*
 	const int indice = id_var - 1;
@@ -304,7 +303,7 @@ bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsi
 			}
 		}
 	}
-	
+
 	for(vector<int>::iterator it_ded=deduites.begin(); it_ded!=deduites.end(); it_ded++) {
 		interpretation[(*it_ded)-1] = 0;
 	}
@@ -312,8 +311,6 @@ bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsi
 
 }
 
-=======
->>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
 /**
  * Indexe les clauses selon les littéraux qu'elles contiennent.
  * @param fc La forme conjonctive dont on indexe les clauses.
@@ -374,7 +371,6 @@ bool contientInsatisfaite(const unsigned int id_var, const short int *interpreta
 
 	return false;
 }
-<<<<<<< HEAD
 
 bool propage(const unsigned int id_var, const short int *interpretation, const index_clauses &index, vector<int> &deduites) {
 
@@ -383,7 +379,7 @@ bool propage(const unsigned int id_var, const short int *interpretation, const i
 	vector<clause*> clauses;
 	vector<int>::iterator it_litt;
 	int nb_litt, nb_litt_ind, nb_litt_neg, id_ind;
-	
+
 	if(interpretation[indice] == 0) {
 
 		clauses = it_clauses->second;
@@ -427,5 +423,3 @@ bool propage(const unsigned int id_var, const short int *interpretation, const i
 
 	return false;
 }
-=======
->>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
