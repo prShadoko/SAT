@@ -24,7 +24,14 @@ extern short int forme_conj_est_satisfaite(const forme_conjonctive &fc, const sh
 extern bool cherche1(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var = 1);
 extern bool cherche2(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const unsigned int id_var = 1);
 extern bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var = 1);
+<<<<<<< HEAD
+extern bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var = 1);
 extern index_clauses indexeClauses(forme_conjonctive &fc);
 extern bool contientInsatisfaite(const unsigned int id_var, const short int *interpretation, const index_clauses &index);
+extern bool propage(const unsigned int id_var, const short int *interpretation, const index_clauses &index, vector<int> &deduites);
+=======
+extern index_clauses indexeClauses(forme_conjonctive &fc);
+extern bool contientInsatisfaite(const unsigned int id_var, const short int *interpretation, const index_clauses &index);
+>>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
 
 #endif

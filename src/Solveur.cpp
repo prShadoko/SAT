@@ -288,6 +288,32 @@ bool cherche3(const forme_conjonctive &fc, short int *interpretation, const unsi
 
 }
 
+<<<<<<< HEAD
+bool cherche4(const forme_conjonctive &fc, short int *interpretation, const unsigned int nb_var, const index_clauses &index, const unsigned int id_var) {
+//*
+	const int indice = id_var - 1;
+	vector<int> deduites;
+	for(interpretation[indice]=1; interpretation[indice]>=-1; interpretation[indice] -= 2) { // 1,-1
+		if(!propage(id_var, interpretation, index, deduites)) {
+			if(id_var < nb_var) { // S'il reste des variables indéfinies
+				if(cherche4(fc, interpretation, nb_var, index, id_var + 1)) {
+					return true;
+				}
+			} else {
+				return true;
+			}
+		}
+	}
+	
+	for(vector<int>::iterator it_ded=deduites.begin(); it_ded!=deduites.end(); it_ded++) {
+		interpretation[(*it_ded)-1] = 0;
+	}
+	return false;
+
+}
+
+=======
+>>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
 /**
  * Indexe les clauses selon les littéraux qu'elles contiennent.
  * @param fc La forme conjonctive dont on indexe les clauses.
@@ -348,3 +374,58 @@ bool contientInsatisfaite(const unsigned int id_var, const short int *interpreta
 
 	return false;
 }
+<<<<<<< HEAD
+
+bool propage(const unsigned int id_var, const short int *interpretation, const index_clauses &index, vector<int> &deduites) {
+
+	unsigned int indice = id_var - 1;
+	map< unsigned int, vector<clause*> >::const_iterator it_clauses;
+	vector<clause*> clauses;
+	vector<int>::iterator it_litt;
+	int nb_litt, nb_litt_ind, nb_litt_neg, id_ind;
+	
+	if(interpretation[indice] == 0) {
+
+		clauses = it_clauses->second;
+	}
+
+	if(interpretation[indice] > 0) {
+
+		if((it_clauses = index.neg.find(id_var)) == index.neg.end()) {
+			return false;
+		} else {
+			clauses = it_clauses->second;
+		}
+	} else {
+		if((it_clauses = index.pos.find(id_var)) == index.pos.end()) {
+			return false;
+		} else {
+			clauses = it_clauses->second;
+		}
+	}
+
+	for(vector<clause*>::const_iterator it=it_clauses->second.begin(); it!=it_clauses->second.end(); it++) {
+		for(it_litt=(*it)->begin(); it_litt!=(*it)->end(); it_litt++) {
+			nb_litt++;
+			if(interpretation[*it_litt-1] == -1) {
+				nb_litt_neg++;
+			}
+			if(interpretation[*it_litt-1] == 0) {
+				nb_litt_ind++;
+				id_ind = *it_litt;
+			}
+		}
+		if(nb_litt == nb_litt_neg+nb_litt_ind && nb_litt_ind == 1) {
+			deduites.push_back(*it_litt);
+			return propage(id_ind, interpretation, index, deduites);
+		}
+		if(clause_est_satisfaite((**it), interpretation) == -1) {
+
+			return true;
+		}
+	}
+
+	return false;
+}
+=======
+>>>>>>> 51d861bd2202c1e672dfffcdff2c33bde448bd03
